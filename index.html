@@ -6626,12 +6626,22 @@ function _applyI18nStatic() {
         console.log('GESTIONALE REALTIME MATERIALI:', payload);
 
         if (payload.new && payload.new.data_json) {
-          saveData(LS.MAT_LIBRARY, payload.new.data_json);
+  const updatedMaterials = payload.new.data_json;
 
-          renderMatLibRows();
-          _updateMatLibSelect('emb');
-          _updateMatLibSelect('dtf');
-        }
+  localStorage.setItem(
+    'ssp_mat_library_v1',
+    JSON.stringify(updatedMaterials)
+  );
+
+  console.log(
+    'MATERIALI SALVATI DA REALTIME:',
+    updatedMaterials
+  );
+
+  renderMatLibRows();
+  _updateMatLibSelect('emb');
+  _updateMatLibSelect('dtf');
+}
       }
     )
     .subscribe((status) => {
