@@ -6573,16 +6573,20 @@ function _applyI18nStatic() {
         console.log('GESTIONALE REALTIME PREVENTIVO:', payload);
 
         if (payload.new && payload.new.data_json) {
-          activeQuote = payload.new.data_json;
+  activeQuote = payload.new.data_json;
 
-          saveData(LS.ACTIVE_QUOTE, activeQuote);
+  saveData(LS.ACTIVE_QUOTE, activeQuote);
 
-          console.log(
-            'PREVENTIVO ATTIVO AGGIORNATO:',
-            activeQuote
-          );
-        }
-      }
+  console.log(
+    'PREVENTIVO ATTIVO AGGIORNATO:',
+    activeQuote
+  );
+
+  // Aggiorna la schermata del preventivo
+  if (typeof showActiveQuote === 'function') {
+    showActiveQuote();
+  }
+}
     )
     .subscribe((status) => {
       console.log(
