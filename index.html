@@ -6559,6 +6559,24 @@ function _applyI18nStatic() {
     await loadActiveQuoteFromSupabase();
   await loadSettingsFromSupabase();
   await loadOrdersFromSupabase();
+      // Realtime: aggiorna gli ordini automaticamente
+  supabaseClient
+    .channel('orders-realtime')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'orders'
+      },
+      async () => {
+        await loadOrdersFromSupabase();
+        renderOrders();
+        renderOrderStats();
+        renderDashboard();
+      }
+    )
+    .subscribe();
   await loadInventoryFromSupabase();
   await loadMatLibraryFromSupabase();
 
