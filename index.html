@@ -6559,6 +6559,7 @@ function _applyI18nStatic() {
   await loadSettingsFromSupabase();
   await loadOrdersFromSupabase();
   await loadInventoryFromSupabase();
+  await loadMatLibraryFromSupabase();
 
   // Load gang sheets from localStorage (persists user's custom costs)
   const savedGang = localStorage.getItem('ssp_gangsheets_v1');
