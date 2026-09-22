@@ -6641,6 +6641,8 @@ function _migrateOrders(arr) {
 
 async function loadOrdersFromSupabase() {
   try {
+    console.log('SUPABASE: inizio lettura ordini');
+
     const { data, error } = await supabaseClient
       .from('orders')
       .select('id, data_json')
