@@ -6561,29 +6561,44 @@ function _applyI18nStatic() {
   await loadSettingsFromSupabase();
   await loadOrdersFromSupabase();
     
-        // Realtime: aggiorna gli ordini automaticamente
-  supabaseClient
-    .channel('orders-realtime')
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'orders'
-      },
-      (payload) => {
-        console.log('GESTIONALE REALTIME ORDINI:', payload);
+// Realtime: aggiorna gli ordini automaticamente
+supabaseClient
+  .channel('orders-realtime')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'orders'
+    },
+    (payload) => {
+      console.log('GESTIONALE REALTIME ORDINI:', payload);
 
-        loadOrdersFromSupabase().then(() => {
-          renderOrders();
-          renderOrderStats();
-          renderDashboard();
-        });
+      // DELETE: rimuove subito l'ordine anche sul secondo PC
+      if (payload.eventType === 'DELETE' && payload.old && payload.old.id) {
+        orders = orders.filter(o => String(o.id) !== String(payload.old.id));
+
+        saveData(LS.ORDERS, orders);
+
+        renderOrders();
+        renderOrderStats();
+        renderDashboard();
+
+        console.log('ORDINE ELIMINATO DA REALTIME:', payload.old.id);
+        return;
       }
-    )
-    .subscribe((status) => {
-      console.log('GESTIONALE REALTIME STATO:', status);
-    });
+
+      // INSERT / UPDATE: ricarica gli ordini da Supabase
+      loadOrdersFromSupabase().then(() => {
+        renderOrders();
+        renderOrderStats();
+        renderDashboard();
+      });
+    }
+  )
+  .subscribe((status) => {
+    console.log('GESTIONALE REALTIME STATO:', status);
+  });
   await loadInventoryFromSupabase();
     
   // Realtime: aggiorna l'inventario automaticamente
