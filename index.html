@@ -9499,7 +9499,24 @@ function saveInvItem() {
   } else {
     inventory.push({ id: Date.now(), ...data });
   }
+
   saveData(LS.INVENTORY, inventory);
+
+  // Sincronizza inventario con Supabase
+  (async () => {
+    const { error } = await supabaseClient
+      .from('inventory')
+      .upsert({
+        id: 1,
+        data_json: inventory
+      });
+
+    if (error) {
+      console.error('Supabase inventory sync error:', error);
+      _toast('Supabase error', error.message, 'err');
+    }
+  })();
+
   closeInvModal();
   renderInventory();
   renderDashboard();
