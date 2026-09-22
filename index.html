@@ -6539,9 +6539,10 @@ function _applyI18nStatic() {
 // ═══════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════
-(function init() {
- loadAllData();
-loadOrdersFromSupabase();
+(async function init() {
+  loadAllData();
+  await loadSettingsFromSupabase();
+  await loadOrdersFromSupabase();
 
   // Load gang sheets from localStorage (persists user's custom costs)
   const savedGang = localStorage.getItem('ssp_gangsheets_v1');
