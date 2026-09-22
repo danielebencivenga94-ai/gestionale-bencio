@@ -6574,21 +6574,29 @@ supabaseClient
     (payload) => {
       console.log('GESTIONALE REALTIME ORDINI:', payload);
 
-      // DELETE: rimuove subito l'ordine anche sul secondo PC
-      if (payload.eventType === 'DELETE' && payload.old && payload.old.id) {
-        orders = orders.filter(o => String(o.id) !== String(payload.old.id));
+      if (payload.eventType === 'DELETE') {
+        const deletedId = payload.old?.id;
 
-        saveData(LS.ORDERS, orders);
+        console.log('DELETE RICEVUTO, ID:', deletedId);
 
-        renderOrders();
-        renderOrderStats();
-        renderDashboard();
+        if (deletedId) {
+          orders = orders.filter(
+            o => String(o.id) !== String(deletedId)
+          );
 
-        console.log('ORDINE ELIMINATO DA REALTIME:', payload.old.id);
+          saveData(LS.ORDERS, orders);
+
+          renderOrders();
+          renderOrderStats();
+          renderDashboard();
+
+          console.log('ORDINE ELIMINATO DA REALTIME:', deletedId);
+        }
+
         return;
       }
 
-      // INSERT / UPDATE: ricarica gli ordini da Supabase
+      // INSERT / UPDATE
       loadOrdersFromSupabase().then(() => {
         renderOrders();
         renderOrderStats();
@@ -6599,6 +6607,7 @@ supabaseClient
   .subscribe((status) => {
     console.log('GESTIONALE REALTIME STATO:', status);
   });
+    
   await loadInventoryFromSupabase();
     
   // Realtime: aggiorna l'inventario automaticamente
