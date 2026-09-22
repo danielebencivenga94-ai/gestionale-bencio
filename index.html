@@ -6540,12 +6540,8 @@ function _applyI18nStatic() {
 //  INIT
 // ═══════════════════════════════════════════════
 (function init() {
-  loadAllData();
-  console.log('AVVIO CARICAMENTO SUPABASE');
-
-  loadOrdersFromSupabase().then(() => {
-    console.log('SUPABASE: funzione terminata');
-  });
+ loadAllData();
+loadOrdersFromSupabase();
 
   // Load gang sheets from localStorage (persists user's custom costs)
   const savedGang = localStorage.getItem('ssp_gangsheets_v1');
