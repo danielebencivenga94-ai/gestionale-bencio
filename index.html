@@ -6558,46 +6558,6 @@ function _applyI18nStatic() {
   loadAllData();
     
     await loadActiveQuoteFromSupabase();
-
-     // Realtime: aggiorna il preventivo attivo automaticamente
-  supabaseClient
-    .channel('active-quote-realtime')
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'active_quote'
-      },
-      (payload) => {
-        console.log('GESTIONALE REALTIME PREVENTIVO:', payload);
-
-        if (payload.new && payload.new.data_json) {
-  activeQuote = payload.new.data_json;
-
-  saveData(LS.ACTIVE_QUOTE, activeQuote);
-
-  console.log(
-    'PREVENTIVO ATTIVO AGGIORNATO:',
-    activeQuote
-  );
-
-  // Aggiorna la schermata del preventivo
-  if (typeof showActiveQuote === 'function') {
-    showActiveQuote();
-  }
-}
-    )
-    .subscribe((status) => {
-      console.log(
-        'GESTIONALE REALTIME PREVENTIVO STATO:',
-        status
-      );
-    });
-
-
-quindi tutto questo
-    
   await loadSettingsFromSupabase();
   await loadOrdersFromSupabase();
     
