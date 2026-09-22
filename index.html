@@ -6559,7 +6559,8 @@ function _applyI18nStatic() {
     await loadActiveQuoteFromSupabase();
   await loadSettingsFromSupabase();
   await loadOrdersFromSupabase();
-      // Realtime: aggiorna gli ordini automaticamente
+    
+        // Realtime: aggiorna gli ordini automaticamente
   supabaseClient
     .channel('orders-realtime')
     .on(
@@ -6569,14 +6570,19 @@ function _applyI18nStatic() {
         schema: 'public',
         table: 'orders'
       },
-      async () => {
-        await loadOrdersFromSupabase();
-        renderOrders();
-        renderOrderStats();
-        renderDashboard();
+      (payload) => {
+        console.log('GESTIONALE REALTIME ORDINI:', payload);
+
+        loadOrdersFromSupabase().then(() => {
+          renderOrders();
+          renderOrderStats();
+          renderDashboard();
+        });
       }
     )
-    .subscribe();
+    .subscribe((status) => {
+      console.log('GESTIONALE REALTIME STATO:', status);
+    });
   await loadInventoryFromSupabase();
   await loadMatLibraryFromSupabase();
 
