@@ -6585,7 +6585,7 @@ function _applyI18nStatic() {
     });
   await loadInventoryFromSupabase();
     
-      // Realtime: aggiorna l'inventario automaticamente
+  // Realtime: aggiorna l'inventario automaticamente
   supabaseClient
     .channel('inventory-realtime')
     .on(
@@ -6598,10 +6598,13 @@ function _applyI18nStatic() {
       (payload) => {
         console.log('GESTIONALE REALTIME INVENTARIO:', payload);
 
-        loadInventoryFromSupabase().then(() => {
+        if (payload.new && payload.new.data_json) {
+          inventory = payload.new.data_json;
+          saveData(LS.INVENTORY, inventory);
+
           renderInventory();
           renderDashboard();
-        });
+        }
       }
     )
     .subscribe((status) => {
