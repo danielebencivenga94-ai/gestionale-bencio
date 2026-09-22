@@ -8949,6 +8949,21 @@ function saveQuoteToOrders() {
   orders.push(order);
   saveData(LS.ORDERS, orders);
   updateSaveBadges();
+
+      // Sync converted order with Supabase
+  (async () => {
+    const { error } = await supabaseClient
+      .from('orders')
+      .upsert({
+        id: order.id,
+        data_json: order
+      });
+
+    if (error) {
+      console.error('Supabase converted order sync error:', error);
+      _toast('Supabase error', error.message, 'err');
+    }
+  })();
   updateQuoteIndicator();
   showPanel('orders');
   renderOrders();
