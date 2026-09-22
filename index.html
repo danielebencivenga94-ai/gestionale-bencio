@@ -7253,6 +7253,21 @@ function saveSetup(btnEl) {
   if (_sv('stab-piece-layers')?.value) settings.stabPieceLayers = parseInt(_sv('stab-piece-layers').value) || settings.stabPieceLayers;
   if (_sv('stab-waste')?.value !== undefined) settings.stabWastePct = parseFloat(_sv('stab-waste').value) ?? settings.stabWastePct;
   saveData(LS.SETTINGS, settings);
+
+// Sync settings with Supabase
+(async () => {
+  const { error } = await supabaseClient
+    .from('settings')
+    .upsert({
+      id: 1,
+      data_json: settings
+    });
+
+  if (error) {
+    console.error('Supabase settings sync error:', error);
+    _toast('Supabase error', error.message, 'err');
+  }
+})();
   saveData('ssp_gangsheets_v1', gangSheets);
 
   // Hide notice
