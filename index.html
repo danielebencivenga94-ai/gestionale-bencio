@@ -6757,14 +6757,17 @@ async function loadMatLibraryFromSupabase() {
     if (data && data.data_json) {
       saveData(LS.MAT_LIBRARY, data.data_json);
 
-      // Aggiorna le viste che usano la libreria materiali
+      // Aggiorna la libreria nelle Impostazioni
       renderMatLibRows();
+
+      // Aggiorna i menu dei calcolatori
       _updateMatLibSelect('emb');
+      _updateMatLibSelect('dtf');
     }
   } catch (e) {
     console.error('Supabase material library connection error:', e);
   }
-}    
+}
 function loadAllData() {
   try {
     const s = localStorage.getItem(LS.SETTINGS);
