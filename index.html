@@ -6638,6 +6638,33 @@ function _migrateOrders(arr) {
   });
 }
 
+async function loadOrdersFromSupabase() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('orders')
+      .select('id, data_json')
+      .order('id', { ascending: true });
+
+    if (error) {
+      console.error('Supabase load error:', error);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      orders = data
+        .map(row => row.data_json)
+        .filter(Boolean)
+        .map(o => _migrateOrders([o])[0]);
+
+      // Aggiorna anche il Local Storage come copia locale
+      saveData(LS.ORDERS, orders);
+
+      console.log('Ordini caricati da Supabase:', orders.length);
+    }
+  } catch (e) {
+    console.error('Supabase connection error:', e);
+  }
+}    
 function loadAllData() {
   try {
     const s = localStorage.getItem(LS.SETTINGS);
