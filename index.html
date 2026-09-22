@@ -5352,6 +5352,21 @@ function _getMatLibrary() {
 
 function _saveMatLibrary(lib) {
   localStorage.setItem(LS.MAT_LIBRARY, JSON.stringify(lib));
+
+  // Sincronizza libreria materiali con Supabase
+  (async () => {
+    const { error } = await supabaseClient
+      .from('mat_library')
+      .upsert({
+        id: 1,
+        data_json: lib
+      });
+
+    if (error) {
+      console.error('Supabase material library sync error:', error);
+      _toast('Supabase error', error.message, 'err');
+    }
+  })();
 }
 
 function _renderMatRows(prefix, arr, calcFn) {
