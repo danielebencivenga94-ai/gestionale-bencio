@@ -9243,11 +9243,23 @@ async function deleteOrder() {
   });
   if (!ok) return;
   orders = orders.filter(o => String(o.id) !== id);
-  saveData(LS.ORDERS, orders);
-  closeOrderModal();
-  renderOrders();
-  renderOrderStats();
-  renderDashboard();
+saveData(LS.ORDERS, orders);
+
+const { error } = await supabaseClient
+  .from('orders')
+  .delete()
+  .eq('id', Number(id));
+
+if (error) {
+  console.error('Supabase delete error:', error);
+  _toast('Supabase error', error.message, 'err');
+  return;
+}
+
+closeOrderModal();
+renderOrders();
+renderOrderStats();
+renderDashboard();
 }
 
 // ═══════════════════════════════════════════════
