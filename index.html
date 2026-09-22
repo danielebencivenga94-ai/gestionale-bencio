@@ -6556,6 +6556,7 @@ function _applyI18nStatic() {
 // ═══════════════════════════════════════════════
 (async function init() {
   loadAllData();
+    await loadActiveQuoteFromSupabase();
   await loadSettingsFromSupabase();
   await loadOrdersFromSupabase();
   await loadInventoryFromSupabase();
@@ -6824,12 +6825,66 @@ function loadAllData() {
     if (aq) activeQuote = JSON.parse(aq);
   } catch(e) {}
 }
+    async function loadActiveQuoteFromSupabase() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('active_quote')
+      .select('id, data_json')
+      .eq('id', 1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Supabase active quote load error:', error);
+      return;
+    }
+
+    if (data && data.data_json) {
+      activeQuote = data.data_json;
+
+      // Aggiorna anche il Local Storage come copia locale
+      saveData(LS.ACTIVE_QUOTE, activeQuote);
+
+      // Aggiorna la visualizzazione del preventivo
+      showActiveQuote();
+    }
+  } catch (e) {
+    console.error('Supabase active quote connection error:', e);
+  }
+}
 
 function saveActiveQuote() {
   if (activeQuote) {
     saveData(LS.ACTIVE_QUOTE, activeQuote);
+
+    // Sync active quote with Supabase
+    (async () => {
+      const { error } = await supabaseClient
+        .from('active_quote')
+        .upsert({
+          id: 1,
+          data_json: activeQuote
+        });
+
+      if (error) {
+        console.error('Supabase active quote sync error:', error);
+        _toast('Supabase error', error.message, 'err');
+      }
+    })();
+
   } else {
     try { localStorage.removeItem(LS.ACTIVE_QUOTE); } catch(e) {}
+
+    // Remove active quote from Supabase
+    (async () => {
+      const { error } = await supabaseClient
+        .from('active_quote')
+        .delete()
+        .eq('id', 1);
+
+      if (error) {
+        console.error('Supabase active quote delete error:', error);
+      }
+    })();
   }
 }
 
