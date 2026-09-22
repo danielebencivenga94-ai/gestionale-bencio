@@ -9391,15 +9391,32 @@ function renderInventory() {
   renderInvAlerts();
 }
 
-function quickAdjustInv(id, delta) {
+async function quickAdjustInv(id, delta) {
   const item = inventory.find(i => String(i.id) === String(id));
   if (!item) return;
-  item.qty = Math.max(0, (item.qty||0) + delta);
+
+  item.qty = Math.max(0, (item.qty || 0) + delta);
+
+  // Salva localmente
   saveData(LS.INVENTORY, inventory);
+
+  // Sincronizza con Supabase
+  const { error } = await supabaseClient
+    .from('inventory')
+    .upsert({
+      id: 1,
+      data_json: inventory
+    });
+
+  if (error) {
+    console.error('Supabase inventory sync error:', error);
+    _toast('Supabase error', error.message, 'err');
+    return;
+  }
+
   renderInventory();
   renderDashboard();
 }
-
 function renderInvStats() {
   const total = inventory.length;
   const low   = inventory.filter(i => i.qty > 0 && i.qty <= i.lowAt).length;
