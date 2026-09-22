@@ -7371,6 +7371,21 @@ saveData(LS.SETTINGS, settings);
 })();
   saveData('ssp_gangsheets_v1', gangSheets);
 
+// Sync gang sheets with Supabase
+(async () => {
+  const { error } = await supabaseClient
+    .from('gangsheets')
+    .upsert({
+      id: 1,
+      data_json: gangSheets
+    });
+
+  if (error) {
+    console.error('Supabase gang sheets sync error:', error);
+    _toast('Supabase error', error.message, 'err');
+  }
+})();
+
   // Hide notice
   const notice = document.getElementById('setup-notice');
   if (notice) notice.style.display = 'none';
