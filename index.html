@@ -6698,6 +6698,32 @@ async function loadSettingsFromSupabase() {
     console.error('Supabase settings connection error:', e);
   }
 }
+async function loadInventoryFromSupabase() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('inventory')
+      .select('id, data_json')
+      .eq('id', 1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Supabase inventory load error:', error);
+      return;
+    }
+
+    if (data && data.data_json) {
+      inventory = data.data_json;
+
+      // Aggiorna anche il Local Storage come copia locale
+      saveData(LS.INVENTORY, inventory);
+
+      // Aggiorna l'interfaccia
+      renderInventory();
+    }
+  } catch (e) {
+    console.error('Supabase inventory connection error:', e);
+  }
+}    
 function loadAllData() {
   try {
     const s = localStorage.getItem(LS.SETTINGS);
