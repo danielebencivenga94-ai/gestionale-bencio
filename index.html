@@ -6584,6 +6584,29 @@ function _applyI18nStatic() {
       console.log('GESTIONALE REALTIME STATO:', status);
     });
   await loadInventoryFromSupabase();
+    
+      // Realtime: aggiorna l'inventario automaticamente
+  supabaseClient
+    .channel('inventory-realtime')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'inventory'
+      },
+      (payload) => {
+        console.log('GESTIONALE REALTIME INVENTARIO:', payload);
+
+        loadInventoryFromSupabase().then(() => {
+          renderInventory();
+          renderDashboard();
+        });
+      }
+    )
+    .subscribe((status) => {
+      console.log('GESTIONALE REALTIME INVENTARIO STATO:', status);
+    });
   await loadMatLibraryFromSupabase();
 
   // Load gang sheets from localStorage (persists user's custom costs)
