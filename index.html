@@ -6540,9 +6540,10 @@ function _applyI18nStatic() {
 //  INIT
 // ═══════════════════════════════════════════════
 (function init() {
+  alert('TEST INIT');
   loadAllData();
-    console.log('AVVIO CARICAMENTO SUPABASE');
-loadOrdersFromSupabase();
+  console.log('AVVIO CARICAMENTO SUPABASE');
+  loadOrdersFromSupabase();
 
   // Load gang sheets from localStorage (persists user's custom costs)
   const savedGang = localStorage.getItem('ssp_gangsheets_v1');
