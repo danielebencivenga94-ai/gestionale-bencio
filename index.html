@@ -9175,6 +9175,25 @@ async function saveOrder() {
     orders.push(newOrder);
   }
   saveData(LS.ORDERS, orders);
+
+// Sincronizza l'ordine corrente con Supabase
+const currentOrder = id
+  ? orders.find(o => String(o.id) === String(id))
+  : orders[orders.length - 1];
+
+if (currentOrder) {
+  const { error } = await supabaseClient
+    .from('orders')
+    .upsert({
+      id: Number(currentOrder.id),
+      data_json: currentOrder
+    });
+
+  if (error) {
+    console.error('Supabase sync error:', error);
+    _toast('Supabase error', error.message, 'err');
+  }
+}
   closeOrderModal();
   renderOrders();
   renderOrderStats();
