@@ -6612,6 +6612,32 @@ function _applyI18nStatic() {
     });
   await loadMatLibraryFromSupabase();
 
+      // Realtime: aggiorna la libreria materiali automaticamente
+  supabaseClient
+    .channel('mat-library-realtime')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'mat_library'
+      },
+      (payload) => {
+        console.log('GESTIONALE REALTIME MATERIALI:', payload);
+
+        if (payload.new && payload.new.data_json) {
+          saveData(LS.MAT_LIBRARY, payload.new.data_json);
+
+          renderMatLibRows();
+          _updateMatLibSelect('emb');
+          _updateMatLibSelect('dtf');
+        }
+      }
+    )
+    .subscribe((status) => {
+      console.log('GESTIONALE REALTIME MATERIALI STATO:', status);
+    });
+
   // Load gang sheets from localStorage (persists user's custom costs)
   const savedGang = localStorage.getItem('ssp_gangsheets_v1');
   if (savedGang) {
