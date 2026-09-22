@@ -10439,5 +10439,34 @@ function _highlightNewOrder(id) {
     </div>
   </div>
 </div>
+    <button onclick="testSupabase()" style="position:fixed;bottom:20px;right:20px;z-index:99999;padding:12px 20px;font-size:16px;">
+TEST SUPABASE
+</button>
+
+<script>
+async function testSupabase() {
+    const testId = Date.now();
+
+    const { data, error } = await supabaseClient
+        .from('orders')
+        .insert({
+            id: testId,
+            data_json: {
+                test: true,
+                messaggio: "Test collegamento Supabase",
+                data: new Date().toISOString()
+            }
+        })
+        .select();
+
+    if (error) {
+        console.error(error);
+        alert("ERRORE SUPABASE:\n" + error.message);
+    } else {
+        console.log(data);
+        alert("✅ Collegamento Supabase riuscito!");
+    }
+}
+</script>
 </body>
 </html>
